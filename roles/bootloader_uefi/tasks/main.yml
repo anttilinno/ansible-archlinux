@@ -1,0 +1,30 @@
+---
+- name: Install systemd-boot to /boot
+  shell: bootctl --path=/boot install
+
+- name: Obtain UUID of the encrypted partition
+  shell: blkid --match-tag UUID -o value /dev/nvme0n1p2
+  register: crypt_uuid
+
+- name: Create bootloader entry for Arch Linux
+  shell: |
+    cat <<EOF > /boot/loader/entries/arch.conf
+    title Arch Linux
+    linux /vmlinuz-linux
+    initrd /initramfs-linux.img
+    options cryptdevice=UUID={{ crypt_uuid.stdout }}:cryptlvm root=/dev/volgrp/root
+    EOF
+
+- name: Create systemd-boot loader configuration
+  shell: |
+    cat <<EOF > /boot/loader/loader.conf
+    default arch
+    timeout 0
+    editor 0
+    EOF
+
+- name: Update mkinitcpio hooks for encryption and LVM support
+  shell: sed -i '/^HOOKS=.*fsck)$/s/fsck)/fsck encrypt lvm2)/' /etc/mkinitcpio.conf
+
+- name: Regenerate initramfs images
+  shell: mkinitcpio -P

@@ -1,0 +1,9 @@
+---
+- name: Synchronize package databases
+  shell: pacman -Sy
+
+- name: Install archlinux-keyring
+  shell: pacman -S --noconfirm archlinux-keyring
+
+- name: Install base packages (BIOS example)
+  shell: pacstrap -K /mnt base linux linux-firmware networkmanager wpa_supplicant intel-ucode mesa xf86-video-intel syslinux

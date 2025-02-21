@@ -1,0 +1,6 @@
+---
+- name: Reset machine-id for VirtualBox guest
+  shell: rm -f /etc/machine-id && systemd-machine-id-setup
+
+- name: Enable VirtualBox guest service
+  shell: systemctl enable vboxservice.service

@@ -1,0 +1,27 @@
+---
+- name: Clone and install yay as user 'antti'
+  become: yes
+  become_user: antti
+  shell: |
+    git clone https://aur.archlinux.org/yay-bin.git ~/yay-bin && cd ~/yay-bin && makepkg -si --noconfirm
+
+- name: Install fnm (Node version manager) as user 'antti'
+  become: yes
+  become_user: antti
+  shell: curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell
+
+- name: Install shell utilities (shellcheck, oh-my-posh) via yay as user 'antti'
+  become: yes
+  become_user: antti
+  shell: yay -S --noconfirm shellcheck-bin oh-my-posh-bin
+
+- name: Initialize dotfiles with chezmoi
+  become: yes
+  become_user: antti
+  shell: |
+    chezmoi init https://github.com/anttilinno/dotfiles.git && chezmoi update
+
+- name: Build bat cache
+  become: yes
+  become_user: antti
+  shell: bat cache --build

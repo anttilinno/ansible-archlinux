@@ -1,0 +1,25 @@
+---
+- name: Install Arch Linux using Ansible roles
+  hosts: localhost
+  become: yes
+  vars:
+    install_type: "bios"
+    install_virtualbox: true
+    install_xorg: true
+    install_wayland: false
+
+  roles:
+    - { role: partitioning_bios, when: install_type == "bios" }
+    - { role: partitioning_uefi, when: install_type == "uefi" }
+    - base_install
+    - basic_configuration
+    - { role: bootloader_bios, when: install_type == "bios" }
+    - { role: bootloader_uefi, when: install_type == "uefi" }
+    - network
+    - user_packages
+    - { role: virtualbox, when: install_virtualbox }
+    - { role: xorg, when: install_xorg }
+    - { role: wayland, when: install_wayland }
+    - sudo_setup
+    - create_user
+    - user_environment

@@ -1,0 +1,24 @@
+---
+- name: Create msdos partition table on /dev/sda
+  shell: parted -s /dev/sda mklabel msdos
+
+- name: Create linux-swap partition on /dev/sda (1MiB to 4GiB)
+  shell: parted -s /dev/sda mkpart primary linux-swap 1MiB 4GiB
+
+- name: Create btrfs partition on /dev/sda (4GiB to 100%)
+  shell: parted -s /dev/sda mkpart primary btrfs 4GiB 100%
+
+- name: Setup swap on /dev/sda1
+  shell: mkswap /dev/sda1
+
+- name: Format btrfs partition with label 'root'
+  shell: mkfs.btrfs -L root /dev/sda2
+
+- name: Check system time using timedatectl
+  shell: timedatectl
+
+- name: Mount btrfs partition to /mnt
+  shell: mount /dev/sda2 /mnt
+
+- name: Enable swap
+  shell: swapon /dev/sda1

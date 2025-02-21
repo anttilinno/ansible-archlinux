@@ -1,0 +1,3 @@
+---
+- name: Install Xorg and associated packages
+  shell: pacman -S --noconfirm xsel rofi wezterm polybar i3-wm xorg-xinit xorg-server

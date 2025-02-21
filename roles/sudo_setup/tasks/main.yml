@@ -1,0 +1,12 @@
+---
+- name: Configure sudoers for wheel group
+  shell: echo '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/wheel
+
+- name: Allow passwordless reboot/shutdown for wheel group
+  shell: echo '%wheel ALL=(ALL) NOPASSWD: /usr/bin/reboot, /usr/bin/shutdown' > /etc/sudoers.d/reboot-shutdown
+
+- name: Set correct permissions on sudoers files
+  shell: chmod 0440 /etc/sudoers.d/*
+
+- name: Validate sudoers configuration
+  shell: visudo -c

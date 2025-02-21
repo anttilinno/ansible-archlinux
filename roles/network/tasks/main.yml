@@ -1,0 +1,42 @@
+---
+- name: Enable systemd-networkd service
+  shell: systemctl enable systemd-networkd
+
+- name: Configure /etc/resolv.conf with DNS servers
+  shell: |
+    cat <<'EOF' > /etc/resolv.conf
+    nameserver 1.1.1.1
+    nameserver 1.0.0.1
+    EOF
+
+- name: Configure wired network (20-wired.network)
+  shell: |
+    cat <<'EOF' > /etc/systemd/network/20-wired.network
+    [Match]
+    Name=enp1s0 enp0s3
+
+    [Network]
+    DHCP=yes
+
+    [DHCPv4]
+    RouteMetric=100
+
+    [IPv6AcceptRA]
+    RouteMetric=100
+    EOF
+
+- name: Configure wireless network (25-wireless.network)
+  shell: |
+    cat <<'EOF' > /etc/systemd/network/25-wireless.network
+    [Match]
+    Name=wlp2s0
+
+    [Network]
+    DHCP=yes
+
+    [DHCPv4]
+    RouteMetric=600
+
+    [IPv6AcceptRA]
+    RouteMetric=600
+    EOF

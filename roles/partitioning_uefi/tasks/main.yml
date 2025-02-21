@@ -1,0 +1,45 @@
+---
+- name: List block devices
+  shell: lsblk
+  register: lsblk_output
+- debug:
+    var: lsblk_output.stdout_lines
+
+- name: Create GPT partition table on /dev/nvme0n1
+  shell: parted -s /dev/nvme0n1 mklabel gpt
+
+- name: Create boot partition (fat32, 1MiB to 300MiB)
+  shell: parted -s /dev/nvme0n1 mkpart boot fat32 1MiB 300MiB
+
+- name: Set partition 1 as ESP
+  shell: parted -s /dev/nvme0n1 set 1 esp on
+
+- name: Format boot partition as FAT32
+  shell: mkfs.fat -F 32 /dev/nvme0n1p1
+
+- name: Create cryptlvm partition (300MiB to 100%)
+  shell: parted -s /dev/nvme0n1 mkpart cryptlvm 300MiB 100%
+
+- name: Format cryptlvm partition with LUKS
+  shell: cryptsetup luksFormat /dev/nvme0n1p2 --batch-mode
+
+- name: Open the LUKS partition
+  shell: cryptsetup open /dev/nvme0n1p2 cryptlvm
+
+- name: Initialize physical volume for LVM
+  shell: pvcreate /dev/mapper/cryptlvm
+
+- name: Create volume group 'volgrp'
+  shell: vgcreate volgrp /dev/mapper/cryptlvm
+
+- name: Create logical volume 'root' using all free space
+  shell: lvcreate -l 100%FREE volgrp -n root
+
+- name: Format root LV as btrfs (uncomment the one you need)
+  shell: mkfs.btrfs -L root /dev/volgrp/root
+
+- name: Mount root LV to /mnt
+  shell: mount /dev/volgrp/root /mnt
+
+- name: Mount boot partition to /mnt/boot (create directory if missing)
+  shell: mount --mkdir /dev/nvme0n1p1 /mnt/boot

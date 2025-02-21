@@ -1,0 +1,3 @@
+---
+- name: Create user 'antti' in the wheel group with zsh shell and set password
+  shell: useradd -G wheel -m -s /usr/bin/zsh antti && echo 'antti:wanker' | chpasswd

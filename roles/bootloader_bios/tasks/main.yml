@@ -1,0 +1,13 @@
+---
+- name: Create syslinux configuration for Arch Linux
+  shell: |
+    cat <<'EOF' > /boot/syslinux/syslinux.cfg
+    LABEL arch
+        MENU LABEL Arch Linux
+        LINUX ../vmlinuz-linux
+        APPEND root=/dev/sda2 rw
+        INITRD ../initramfs-linux.img
+    EOF
+
+- name: Install syslinux bootloader
+  shell: syslinux-install_update -i -a -m

@@ -1,0 +1,31 @@
+---
+- name: Generate fstab and append to /mnt/etc/fstab
+  shell: genfstab -U /mnt >> /mnt/etc/fstab
+
+- name: Set timezone (using chroot)
+  shell: arch-chroot /mnt ln -sf /usr/share/zoneinfo/Europe/Tallinn /etc/localtime
+
+- name: Set hardware clock in chroot
+  shell: arch-chroot /mnt hwclock --systohc
+
+- name: Uncomment locales (et_EE.UTF-8 and en_US.UTF-8)
+  shell: arch-chroot /mnt sed -i '/^# *\(et_EE.UTF-8\|en_US.UTF-8\)/s/^# *//' /etc/locale.gen
+
+- name: Generate locales
+  shell: arch-chroot /mnt locale-gen
+
+- name: Set LANG in /etc/locale.conf
+  shell: arch-chroot /mnt sh -c "echo 'LANG=en_US.UTF-8' > /etc/locale.conf"
+
+- name: Set hostname (replace <HOSTNAME> with your desired name)
+  shell: arch-chroot /mnt sh -c "echo '<HOSTNAME>' > /etc/hostname"
+
+- name: Remove default skeleton files
+  shell: arch-chroot /mnt rm /etc/skel/.*
+
+- name: Enable NetworkManager service (skip for VirtualBox if needed)
+  shell: arch-chroot /mnt systemctl enable NetworkManager
+
+- name: Reminder - set root password manually in chroot
+  debug:
+    msg: "Remember to run 'arch-chroot /mnt passwd' to set the root password."

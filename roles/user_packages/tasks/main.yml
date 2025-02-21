@@ -1,0 +1,18 @@
+---
+- name: Install first batch of user packages
+  shell: pacman -S --noconfirm zoxide fzf chezmoi fd lazygit base-devel unzip noto-fonts-emoji ttf-jetbrains-mono-nerd eza bat ripgrep curlie zsh openssh yazi qutebrowser neovim git sudo stylua shfmt
+
+- name: Install second batch of user packages
+  shell: pacman -S --noconfirm zoxide fzf chezmoi fd base-devel unzip noto-fonts-emoji ttf-jetbrains-mono-nerd eza bat ripgrep curlie zsh openssh neovim git sudo
+
+- name: Install btrfs-progs for btrfs support
+  shell: pacman -S --noconfirm btrfs-progs
+
+- name: Install e2fsprogs for ext4 support
+  shell: pacman -S --noconfirm e2fsprogs
+
+- name: Install Xorg packages
+  shell: pacman -S --noconfirm xsel rofi wezterm polybar i3-wm xorg-xinit xorg-server
+
+- name: Install Wayland packages
+  shell: pacman -S --noconfirm hyprland foot waybar rofi-wayland ly
